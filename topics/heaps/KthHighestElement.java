@@ -1,19 +1,23 @@
+import java.util.*;
+
 class Solution {
-    // Iterate through the list and put each element into a max heap.
-    // After putting each element into the heap, extract elements until we reach the kth.
     public int findKthLargest(int[] nums, int k) {
-        // Max Heap definition
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<Integer>((a, b) -> b - a);
-        
+
+        // Step 1: Min heap stores K largest elements
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        // Step 2: Traverse all elements
         for (int num : nums) {
-            maxHeap.add(num);
+            // Add current element to heap
+            minHeap.offer(num);
+
+        // Step 3: Remove smallest if size exceeds K
+            if (minHeap.size() > k) {
+                minHeap.poll();
+            }
         }
-        
-        int highestAtIndex = 0;
-        for (int i = 0; i < k; i++) {
-            highestAtIndex = maxHeap.poll();
-        }
-        
-        return highestAtIndex;
+
+        // Step 4: Root is the Kth largest element
+        return minHeap.peek();
     }
 }
