@@ -1,36 +1,37 @@
-class Solution {
-    public int[][] kClosest(int[][] points, int K) {
-        // Store points in a min heap, where the heap comparator is the distance to the origin.
-        // Distance = sqrt(point[0]^2 + point[1]^2)
-        // Extract the top elements from the heap until we have an output of size K
 
-        // Min Heap with custom comparator based on calculated sitance
-        PriorityQueue<int[]> minHeap = new PriorityQueue<int[]>((a, b) -> {
-            double aDistance = calculateDistanceForPoint(a);
-            double bDistance = calculateDistanceForPoint(b);
-            
-            if (aDistance < bDistance) {
-                return -1;
-            } else if (aDistance > bDistance) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
-        
+import java.util.*;
+
+class Solution {
+    public int[][] kClosest(int[][] points, int k) {
+
+        // Step 1: Max heap - farthest point at top
+        PriorityQueue<int[]> maxHeap = new PriorityQueue<>(
+            (a, b) -> Long.compare(distance(b), distance(a)) );
+
+        // Step 2: Traverse all points
         for (int[] point : points) {
-            minHeap.add(point);
+
+            // Add current point
+            maxHeap.offer(point);
+
+            // Step 3: Remove farthest when size > K
+            if (maxHeap.size() > k) {
+                maxHeap.poll();
+            }
         }
-        
-        int[][] output = new int[K][2];
-        for (int i = 0; i < K; i++) {
-            output[i] = minHeap.poll();
+
+        // Step 4: Extract K closest points
+        int[][] result = new int[k][2];
+
+        for (int i = 0; i < k; i++) {
+            result[i] = maxHeap.poll();
         }
-        
-        return output;
+
+        return result;
     }
-    
-    private double calculateDistanceForPoint(int[] point) {
-        return Math.sqrt(point[0] * point[0] + point[1] * point[1])
+
+    // Squared distance avoids expensive sqrt()
+    private long distance(int[] point) {
+        return (long) point[0] * point[0]  + (long) point[1] * point[1];
     }
 }
