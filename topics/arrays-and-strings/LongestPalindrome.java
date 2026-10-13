@@ -1,42 +1,37 @@
-class Solution {
-    // Iterate through each char
-    // Find the longest palindrome that can be created around that char.
-    // // Use two pointers to expand around the char until we hit either end of the string
-    // // or until the chars at each pointer aren't the same.
-    // We need to do this for two cases
-    // 1. Both pointers start on the current char
-    // 2. One pointer starts on the current char, one pointer starts on the char after the current char.
-    public String longestPalindrome(String s) {
-        String longestPalindrome = "";
+public String longestPalindrome(String s) {
+        if (s == null || s.length() < 2)
+            return s;
+
+        int start = 0, end = 0;
         for (int i = 0; i < s.length(); i++) {
-            String oddString = findLongestPalindromeAroundIndexes(s, i, i, "");
-            String evenString = findLongestPalindromeAroundIndexes(s, i, i + 1, "");
-            
-            String longerCurrentString = oddString.length() > evenString.length() ?
-                oddString :
-                evenString;
-            
-            if (longerCurrentString.length() > longestPalindrome.length()) {
-                longestPalindrome = longerCurrentString;
+            // Find odd and even palindrome lengths
+            int odd = expand(s, i, i);
+            int even = expand(s, i, i + 1);
+
+            // Select longer length
+            int len = Math.max(odd, even);
+
+            // Update only when a longer palindrome exists
+            if (len > end - start + 1) {
+                // Calculate inclusive boundaries
+                start = i - (len - 1) / 2;
+                end = i + len / 2;
             }
         }
-        return longestPalindrome;
+
+        // Java substring end is exclusive
+        return s.substring(start, end + 1);
     }
-    
-    // Helper function to find the longest palindrome in a string given two indexes.
-    private String findLongestPalindromeAroundIndexes(String input, int left, 
-                                                      int right, String palindrome) {
-        // First check to make sure neither input is out of bounds.
-        // If so return our running palindrome.
-        if (left < 0 || right >= input.length()) return palindrome;
-        
-        // If the current chars match, recursively check the next chars
-        if (input.charAt(left) == input.charAt(right)) {
-            return findLongestPalindromeAroundIndexes(
-                input, left - 1, right + 1, input.substring(left, right + 1));
+
+    private int expand(String s, int left, int right) {
+
+        // Keep expanding while characters match
+        while (left >= 0 && right < s.length() &&
+               s.charAt(left) == s.charAt(right)) {
+            left--;
+            right++;
         }
-        
-        // If the current chars do not match, return our running palindrome.
-        return palindrome;
+
+        // Return length of last valid palindrome
+        return right - left - 1;
     }
-}
